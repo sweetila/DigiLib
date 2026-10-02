@@ -3,10 +3,12 @@ import { BackgroundLayer } from '@/components/Background'
 import PanelHost from '@/components/PanelHost'
 import Toolbar from '@/components/Toolbar/Toolbar'
 import { useUIStore } from '@/store/useUIStore'
+import { useBackgroundStore } from '@/store/useBackgroundStore'
 
 export default function AppShell() {
   const activePanel = useUIStore((state) => state.activePanel)
   const closePanel = useUIStore((state) => state.closePanel)
+  const overlay = useBackgroundStore((state) => state.overlay)
 
   useEffect(() => {
     if (!activePanel) return
@@ -27,7 +29,7 @@ export default function AppShell() {
       <div
         aria-hidden="true"
         className="fixed inset-0 z-10 bg-black"
-        style={{ opacity: 'var(--overlay-opacity)' }}
+        style={{ opacity: overlay / 100 }}
       />
       <div className="fixed inset-0 z-20">
         <section
