@@ -9,6 +9,7 @@ export type YouTubePlayerStatus =
   | 'ready'
   | 'playing'
   | 'paused'
+  | 'ended'
   | 'buffering'
   | 'blocked'
   | 'error'
@@ -16,6 +17,7 @@ export type YouTubePlayerStatus =
 interface UseYouTubePlayerOptions {
   containerRef: RefObject<HTMLDivElement | null>
   videoId: string
+  startSeconds: number
   muted: boolean
   volume: number
   loop: boolean
@@ -33,28 +35,34 @@ const errorMessages: Record<number, string> = {
 export function useYouTubePlayer({
   containerRef,
   videoId,
+  startSeconds,
   muted,
   volume,
   loop,
   autoplay,
 }: UseYouTubePlayerOptions) {
   const playerRef = useRef<YouTubePlayer | null>(null)
-  const latestOptions = useRef({ videoId, muted, volume, loop, autoplay })
+  const latestOptions = useRef({ videoId, startSeconds, muted, volume, loop, autoplay })
   const loadedVideoId = useRef<string | null>(null)
+  const loadedStartSeconds = useRef(0)
   const hasValidVideoId = Boolean(parseYouTubeUrl(videoId))
   const [status, setStatus] = useState<YouTubePlayerStatus>('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const [videoTitle, setVideoTitle] = useState('')
 
   useEffect(() => {
-    latestOptions.current = { videoId, muted, volume, loop, autoplay }
-  }, [videoId, muted, volume, loop, autoplay])
+    latestOptions.current = { videoId, startSeconds, muted, volume, loop, autoplay }
+  }, [videoId, startSeconds, muted, volume, loop, autoplay])
 
   const setPlayerVolume = useCallback((nextVolume: number) => {
     const player = playerRef.current
     if (player) player.setVolume(Math.min(100, Math.max(0, nextVolume)))
   }, [])
   const play = useCallback(() => {
+    playerRef.current?.playVideo()
+  }, [])
+  const replay = useCallback(() => {
+    playerRef.current?.seekTo(0, true)
     playerRef.current?.playVideo()
   }, [])
   const pause = useCallback(() => {
@@ -66,7 +74,7 @@ export function useYouTubePlayer({
   }, [pause, play])
   const mute = useCallback(() => playerRef.current?.mute(), [])
   const unmute = useCallback(() => playerRef.current?.unMute(), [])
-  const loadVideo = useCallback((id: string) => {
+  const loadVideo = useCallback((id: string, start: number) => {
     const validId = parseYouTubeUrl(id)
     if (!validId) {
       playerRef.current?.pauseVideo()
@@ -76,9 +84,11 @@ export function useYouTubePlayer({
       return
     }
     loadedVideoId.current = validId
+    loadedStartSeconds.current = start
     setVideoTitle('')
     setStatus('loading')
-    playerRef.current?.loadVideoById(validId)
+    if (latestOptions.current.autoplay) playerRef.current?.loadVideoById(validId, start)
+    else playerRef.current?.cueVideoById(validId, start)
   }, [])
 
   useEffect(() => {
@@ -102,6 +112,7 @@ export function useYouTubePlayer({
           return
         }
         loadedVideoId.current = safeVideoId
+        loadedStartSeconds.current = latestOptions.current.startSeconds
         const player = new yt.Player(containerRef.current, {
           videoId: safeVideoId,
           width: '100%',
@@ -111,12 +122,14 @@ export function useYouTubePlayer({
             disablekb: 1,
             modestbranding: 1,
             rel: 0,
+            origin: window.location.origin,
             playsinline: 1,
             iv_load_policy: 3,
             fs: 0,
             loop: latestOptions.current.loop ? 1 : 0,
             ...(latestOptions.current.loop ? { playlist: safeVideoId } : {}),
             autoplay: latestOptions.current.autoplay ? 1 : 0,
+            start: latestOptions.current.startSeconds,
           },
           events: {
             onReady: ({ target }) => {
@@ -145,6 +158,7 @@ export function useYouTubePlayer({
                 setStatus('playing')
                 setVideoTitle(target.getVideoData().title ?? '')
               } else if (data === yt.PlayerState.PAUSED) setStatus('paused')
+              else if (data === yt.PlayerState.ENDED) setStatus('ended')
               else if (data === yt.PlayerState.BUFFERING) setStatus('buffering')
               else if (data === yt.PlayerState.CUED || data === yt.PlayerState.UNSTARTED) {
                 setStatus('ready')
@@ -179,9 +193,12 @@ export function useYouTubePlayer({
       playerRef.current?.pauseVideo()
       return
     }
-    if (!playerRef.current || safeId === loadedVideoId.current) return
-    loadVideo(safeId)
-  }, [videoId, loadVideo])
+    if (
+      !playerRef.current ||
+      (safeId === loadedVideoId.current && startSeconds === loadedStartSeconds.current)
+    ) return
+    loadVideo(safeId, startSeconds)
+  }, [videoId, startSeconds, loadVideo])
 
   useEffect(() => {
     if (!playerRef.current) return
@@ -206,6 +223,7 @@ export function useYouTubePlayer({
     play,
     pause,
     togglePlay,
+    replay,
     mute,
     unmute,
     setVolume: setPlayerVolume,

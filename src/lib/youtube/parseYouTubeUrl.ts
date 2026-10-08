@@ -8,9 +8,14 @@ const YOUTUBE_HOSTS = new Set([
   'www.youtu.be',
 ])
 
-export function parseYouTubeUrl(input: string): string | null {
+export interface ParsedYouTubeInput {
+  videoId: string
+  startSeconds: number
+}
+
+export function parseYouTubeInput(input: string): ParsedYouTubeInput | null {
   const value = input.trim()
-  if (VIDEO_ID_PATTERN.test(value)) return value
+  if (VIDEO_ID_PATTERN.test(value)) return { videoId: value, startSeconds: 0 }
   if (!value || value.startsWith('//') || /[\s\\]/.test(value)) return null
 
   let url: URL
@@ -22,8 +27,7 @@ export function parseYouTubeUrl(input: string): string | null {
 
   if (
     !['https:', 'http:'].includes(url.protocol) ||
-    !YOUTUBE_HOSTS.has(url.hostname.toLowerCase()) ||
-    url.hash
+    !YOUTUBE_HOSTS.has(url.hostname.toLowerCase())
   ) {
     return null
   }
@@ -38,5 +42,31 @@ export function parseYouTubeUrl(input: string): string | null {
     id = segments[1] ?? null
   }
 
-  return id && VIDEO_ID_PATTERN.test(id) ? id : null
+  if (!id || !VIDEO_ID_PATTERN.test(id)) return null
+  const startSeconds = parseStartSeconds(
+    url.searchParams.get('t') ??
+      url.searchParams.get('start') ??
+      (url.hash.startsWith('#t=') ? url.hash.slice(3) : null),
+  )
+  if (url.hash && !url.hash.startsWith('#t=')) return null
+  return { videoId: id, startSeconds }
+}
+
+export function parseYouTubeUrl(input: string): string | null {
+  return parseYouTubeInput(input)?.videoId ?? null
+}
+
+function parseStartSeconds(value: string | null): number {
+  if (!value) return 0
+  if (/^\d+$/.test(value)) {
+    const seconds = Number(value)
+    return Number.isSafeInteger(seconds) ? seconds : 0
+  }
+  const seconds = value.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/)
+  if (!seconds || !seconds[0] || !/[hms]/.test(value)) return 0
+  const total =
+    Number(seconds[1] ?? 0) * 3600 +
+    Number(seconds[2] ?? 0) * 60 +
+    Number(seconds[3] ?? 0)
+  return Number.isSafeInteger(total) ? total : 0
 }

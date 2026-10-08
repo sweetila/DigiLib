@@ -1,2 +1,2 @@
 export { loadYouTubeApi } from './loadYouTubeApi'
-export { parseYouTubeUrl } from './parseYouTubeUrl'
+export { parseYouTubeInput, parseYouTubeUrl } from './parseYouTubeUrl'

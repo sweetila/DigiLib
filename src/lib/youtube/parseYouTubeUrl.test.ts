@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseYouTubeUrl } from './parseYouTubeUrl'
+import { parseYouTubeInput, parseYouTubeUrl } from './parseYouTubeUrl'
 
 const ID = 'Abc_def-123'
 
@@ -24,6 +24,24 @@ describe('parseYouTubeUrl', () => {
     [`  https://www.youtube.com/watch?v=${ID}  `, ID],
   ])('parses %s', (input, expected) => {
     expect(parseYouTubeUrl(input)).toBe(expected)
+  })
+
+  describe('parseYouTubeInput', () => {
+    it.each([
+      [`https://www.youtube.com/watch?v=${ID}&t=90`, 90],
+      [`https://www.youtube.com/watch?v=${ID}&t=90s`, 90],
+      [`https://www.youtube.com/watch?v=${ID}&t=1m30s`, 90],
+      [`https://www.youtube.com/watch?v=${ID}&start=90`, 90],
+      [`https://youtu.be/${ID}#t=90`, 90],
+      [`https://youtu.be/${ID}?t=90`, 90],
+      [ID, 0],
+    ])('returns video and start time for %s', (input, startSeconds) => {
+      expect(parseYouTubeInput(input)).toEqual({ videoId: ID, startSeconds })
+    })
+
+    it('keeps parseYouTubeUrl returning only the video ID', () => {
+      expect(parseYouTubeUrl(`https://youtu.be/${ID}?t=1m30s`)).toBe(ID)
+    })
   })
 
   it.each([

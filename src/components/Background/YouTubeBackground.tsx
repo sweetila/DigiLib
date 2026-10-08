@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useYouTubePlayer, type YouTubePlayerStatus } from '@/hooks/useYouTubePlayer'
+import { shouldFallbackStillFrame } from '@/lib/youtube/stillFrame'
 import { useBackgroundStore } from '@/store/useBackgroundStore'
 import { useUIStore } from '@/store/useUIStore'
 
@@ -16,21 +17,27 @@ export default function YouTubeBackground({ videoId, active, onPlaying }: YouTub
   const muted = useBackgroundStore((state) => state.videoMuted)
   const volume = useBackgroundStore((state) => state.videoVolume)
   const playing = useBackgroundStore((state) => state.videoPlaying)
+  const freezeToStill = useBackgroundStore((state) => state.freezeToStill)
   const isCurrentVideo = useBackgroundStore(
     (state) => state.type === 'youtube' && state.youtube?.videoId === videoId,
+  )
+  const startSeconds = useBackgroundStore((state) =>
+    state.youtube?.videoId === videoId ? state.youtube.startSeconds : 0,
   )
   const brightness = useBackgroundStore((state) => state.brightness)
   const blur = useBackgroundStore((state) => state.blur)
   const setVideoPlaying = useBackgroundStore((state) => state.setVideoPlaying)
+  const setFreezeToStill = useBackgroundStore((state) => state.setFreezeToStill)
   const setCurrentVideoTitle = useBackgroundStore((state) => state.setCurrentVideoTitle)
   const openPanel = useUIStore((state) => state.openPanel)
   const player = useYouTubePlayer({
     containerRef,
     videoId,
+    startSeconds,
     muted,
     volume,
     loop: true,
-    autoplay: playing,
+    autoplay: playing && !freezeToStill,
   })
 
   useEffect(() => {
@@ -58,12 +65,27 @@ export default function YouTubeBackground({ videoId, active, onPlaying }: YouTub
           ref={containerRef}
           className="absolute left-1/2 top-1/2 h-[max(56.25vh,56.25vw)] w-[max(100vw,177.78vh)] -translate-x-1/2 -translate-y-1/2 scale-[1.05] [&_iframe]:h-full [&_iframe]:w-full"
         />
+        <StillFrameCover
+          visible={
+            freezeToStill ||
+            !playing ||
+            player.status === 'paused' ||
+            player.status === 'ended'
+          }
+          videoId={videoId}
+        />
       </div>
       {isCurrentVideo && (
         <BackgroundStatus
           errorMessage={player.errorMessage}
+          onReplay={() => {
+            setVideoPlaying(true)
+            setFreezeToStill(false)
+            player.replay()
+          }}
           onChooseAnother={() => openPanel('background')}
           onPlay={() => {
+            setFreezeToStill(false)
             player.play()
             setVideoPlaying(true)
           }}
@@ -74,11 +96,43 @@ export default function YouTubeBackground({ videoId, active, onPlaying }: YouTub
   )
 }
 
+interface StillFrameCoverProps {
+  videoId: string
+  visible: boolean
+}
+
+function StillFrameCover({ videoId, visible }: StillFrameCoverProps) {
+  const [thumbnail, setThumbnail] = useState<'maxresdefault' | 'hqdefault'>('maxresdefault')
+
+  return (
+    <div
+      aria-hidden="true"
+      className={`absolute left-1/2 top-1/2 z-10 h-[max(56.25vh,56.25vw)] w-[max(100vw,177.78vh)] -translate-x-1/2 -translate-y-1/2 scale-[1.05] transition-opacity duration-[400ms] motion-reduce:duration-0 ${visible ? 'opacity-100' : 'opacity-0'}`}
+    >
+      <img
+        alt=""
+        className="h-full w-full object-cover"
+        onError={() => setThumbnail('hqdefault')}
+        onLoad={(event) => {
+          if (
+            thumbnail === 'maxresdefault' &&
+            shouldFallbackStillFrame(event.currentTarget.naturalWidth)
+          ) {
+            setThumbnail('hqdefault')
+          }
+        }}
+        src={`https://i.ytimg.com/vi/${videoId}/${thumbnail}.jpg`}
+      />
+    </div>
+  )
+}
+
 interface BackgroundStatusProps {
   status: YouTubePlayerStatus
   errorMessage: string
   onPlay: () => void
   onChooseAnother: () => void
+  onReplay: () => void
 }
 
 function BackgroundStatus({
@@ -86,7 +140,23 @@ function BackgroundStatus({
   errorMessage,
   onPlay,
   onChooseAnother,
+  onReplay,
 }: BackgroundStatusProps) {
+  if (status === 'ended') {
+    return createPortal(
+      <div className="fixed inset-0 z-[15] grid place-items-center">
+        <button
+          aria-label="Replay background video"
+          className="glass rounded-xl px-5 py-3 text-sm font-medium text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+          onClick={onReplay}
+          type="button"
+        >
+          Replay
+        </button>
+      </div>,
+      document.body,
+    )
+  }
   if (!['loading', 'blocked', 'error'].includes(status)) return null
 
   const content =

@@ -59,6 +59,53 @@ export default function BackgroundPanel() {
             {error && <p className="m-0 text-sm text-red-300" role="alert">{error}</p>}
           </form>
 
+          {background.recentYouTube.length > 0 && (
+            <div aria-label="Recent YouTube backgrounds" className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="m-0 text-xs font-medium text-muted">Recent</p>
+                <button
+                  aria-label="Clear recent YouTube backgrounds"
+                  className="rounded px-1 text-xs text-muted hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+                  onClick={background.clearRecentYouTube}
+                  type="button"
+                >
+                  Clear
+                </button>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {background.recentYouTube.map((recent) => (
+                  <div className="group relative shrink-0" key={recent.videoId}>
+                    <button
+                      aria-label={`Use ${recent.title || 'YouTube background'}`}
+                      className="block overflow-hidden rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+                      onClick={() => {
+                        setUrl(recent.url)
+                        setError('')
+                        background.setYouTube(recent.url)
+                      }}
+                      title={recent.title || recent.url}
+                      type="button"
+                    >
+                      <img
+                        alt=""
+                        className="h-12 w-20 object-cover"
+                        src={`https://i.ytimg.com/vi/${recent.videoId}/mqdefault.jpg`}
+                      />
+                    </button>
+                    <button
+                      aria-label={`Remove ${recent.title || 'YouTube background'} from recents`}
+                      className="absolute right-1 top-1 grid size-5 translate-x-1 -translate-y-1 place-items-center rounded-full bg-black/75 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+                      onClick={() => background.removeRecentYouTube(recent.videoId)}
+                      type="button"
+                    >
+                      x
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {background.youtube && (
             <div className="flex items-center gap-3 rounded-xl bg-white/[0.04] p-2">
               <img
@@ -73,6 +120,15 @@ export default function BackgroundPanel() {
           )}
 
           <div className="space-y-4">
+            <button
+              aria-label="Freeze to still image (saves battery)"
+              aria-pressed={background.freezeToStill}
+              className={`w-full rounded-xl border border-white/10 px-3 py-2 text-left text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent ${background.freezeToStill ? 'bg-white/10 text-text' : 'text-muted hover:bg-white/[0.06]'}`}
+              onClick={() => background.setFreezeToStill(!background.freezeToStill)}
+              type="button"
+            >
+              Freeze to still image (saves battery)
+            </button>
             <div className="grid grid-cols-2 gap-2">
               <button
                 aria-label={background.videoPlaying ? 'Pause video' : 'Play video'}

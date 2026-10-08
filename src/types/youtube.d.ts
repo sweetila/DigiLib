@@ -39,7 +39,9 @@ interface YouTubePlayer {
   unMute(): void
   isMuted(): boolean
   setVolume(volume: number): void
-  loadVideoById(videoId: string): void
+  loadVideoById(videoId: string, startSeconds?: number): void
+  cueVideoById(videoId: string, startSeconds?: number): void
+  seekTo(seconds: number, allowSeekAhead: boolean): void
   getVideoData(): { title?: string }
   getPlayerState(): number
   destroy(): void
