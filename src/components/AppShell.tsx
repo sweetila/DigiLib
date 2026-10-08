@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import YouTubeAudioPlayer from '@/components/Audio/YouTubeAudioPlayer'
 import { BackgroundLayer } from '@/components/Background'
 import PanelHost from '@/components/PanelHost'
 import Toolbar from '@/components/Toolbar/Toolbar'
@@ -41,8 +42,10 @@ export default function AppShell() {
           </p>
           <p className="mt-3 text-sm text-white/65">Ready when you are.</p>
         </section>
-        <PanelHost />
-        <Toolbar />
+        <YouTubeAudioPlayer>
+          <PanelHost />
+          <Toolbar />
+        </YouTubeAudioPlayer>
       </div>
     </main>
   )

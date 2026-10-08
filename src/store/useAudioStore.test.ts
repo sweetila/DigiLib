@@ -23,12 +23,49 @@ describe('useAudioStore', () => {
 
   it('keeps playback state out of persistence', () => {
     useAudioStore.getState().toggleSourcePlaying('rain')
+    useAudioStore.getState().setYouTubeAudio('https://youtu.be/Abc_def-123')
     useAudioStore.getState().setAutoStart(true)
 
     const saved = JSON.parse(localStorage.getItem('digilib-audio') ?? '{}')
     expect(saved.state).toMatchObject({ autoStart: true })
     expect(saved.state.playing).toBeUndefined()
+    expect(saved.state.youtubePlaying).toBeUndefined()
+    expect(saved.state.youtubeAudio).toEqual({
+      url: 'https://youtu.be/Abc_def-123',
+      videoId: 'Abc_def-123',
+    })
     expect(useAudioStore.getState().playing.rain).toBe(true)
+    expect(useAudioStore.getState().youtubePlaying).toBe(true)
+  })
+
+  it('validates YouTube URLs and stores valid audio', () => {
+    expect(useAudioStore.getState().setYouTubeAudio('https://evil.example/video')).toEqual({
+      ok: false,
+      message: "That doesn't look like a valid YouTube URL.",
+    })
+    expect(useAudioStore.getState().youtubeAudio).toBeNull()
+
+    expect(useAudioStore.getState().setYouTubeAudio(' https://youtu.be/Abc_def-123 ')).toEqual({
+      ok: true,
+    })
+    expect(useAudioStore.getState()).toMatchObject({
+      youtubeAudio: { url: 'https://youtu.be/Abc_def-123', videoId: 'Abc_def-123' },
+      youtubePlaying: true,
+    })
+  })
+
+  it('persists YouTube volume and mute settings but resets playing on rehydrate', async () => {
+    useAudioStore.getState().setYouTubeAudio('https://youtu.be/Abc_def-123')
+    useAudioStore.getState().setYouTubeVolume(42)
+    useAudioStore.getState().setYouTubeMuted(true)
+    await useAudioStore.persist.rehydrate()
+
+    expect(useAudioStore.getState()).toMatchObject({
+      youtubeAudio: { videoId: 'Abc_def-123' },
+      youtubeVolume: 42,
+      youtubeMuted: true,
+      youtubePlaying: false,
+    })
   })
 
   it('toggles mute and playback and stops every source', () => {
@@ -93,5 +130,26 @@ describe('useAudioStore', () => {
   it('migrates invalid or unsupported versions to defaults', () => {
     expect(migrate({ masterVolume: -1 }, 1).masterVolume).toBe(70)
     expect(migrate({}, 99).autoStart).toBe(false)
+  })
+
+  it('migrates version 1 settings with default YouTube audio controls', () => {
+    expect(
+      migrate(
+        {
+          schemaVersion: 1,
+          masterVolume: 60,
+          autoStart: true,
+          sources: useAudioStore.getState().sources,
+        },
+        1,
+      ),
+    ).toMatchObject({
+      schemaVersion: 2,
+      masterVolume: 60,
+      autoStart: true,
+      youtubeAudio: null,
+      youtubeVolume: 70,
+      youtubeMuted: false,
+    })
   })
 })

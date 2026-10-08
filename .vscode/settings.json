@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^git status --short && printf '\\\\n--- manifests ---\\\\n' && ls package\\.json$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

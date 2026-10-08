@@ -1,5 +1,6 @@
 import { AUDIO_SOURCE_IDS, type AudioSourceId } from '@/lib/audio'
 import SoundRow from '@/components/Audio/SoundRow'
+import YouTubeMusicSection from '@/components/Audio/YouTubeMusicSection'
 import Slider from '@/components/ui/Slider'
 import { useAudioMixer } from '@/hooks/useAudioMixer'
 import { useAudioStore } from '@/store/useAudioStore'
@@ -34,6 +35,8 @@ export default function AudioPanel() {
         max={100}
         onChange={setMasterVolume}
       />
+
+      <YouTubeMusicSection />
 
       {status === 'starting' ? (
         <p role="status" className="m-0 text-sm text-muted">Loading soundscape...</p>
