@@ -26,7 +26,7 @@ export default function Slider({
       <input
         aria-label={label}
         aria-valuetext={valueText}
-        className="w-full cursor-pointer accent-accent focus-visible:rounded"
+        className="w-full cursor-pointer accent-accent focus-visible:rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-4"
         type="range"
         min={min}
         max={max}
