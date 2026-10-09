@@ -1,63 +1,65 @@
-import {
-  addFilter,
-  addGain,
-  addLfo,
-  addNoiseSource,
-  createSource,
-} from '../sourceUtils'
 import { SOURCE_TUNING } from '../tuning'
 import type { AudioSourceFactory } from '../sources'
 
-export const windSource: AudioSourceFactory = (ctx, destination) => {
-  const tuning = SOURCE_TUNING.wind
-  return createSource(
-    ctx,
-    destination,
-    tuning.baseGain,
-    tuning.lowpassHz,
-    (output, graph) => {
-      const noise = addNoiseSource(ctx, graph, 'pink')
-      const band = addFilter(
-        ctx,
-        graph,
-        'bandpass',
-        tuning.bandpassHz,
-        tuning.bandpassQ,
-      )
-      const gustGain = addGain(ctx, graph, tuning.gustBaseGain)
-      noise.connect(band)
-      band.connect(gustGain)
-      gustGain.connect(output)
-      tuning.centerLfoRatesHz.forEach((rate, index) => {
-        addLfo(
-          ctx,
-          graph,
-          band.frequency,
-          rate,
-          tuning.centerLfoDepthsHz[index] ?? 0,
-        )
-      })
-      tuning.gainLfoRatesHz.forEach((rate, index) => {
-        addLfo(
-          ctx,
-          graph,
-          gustGain.gain,
-          rate,
-          tuning.gainLfoDepths[index] ?? 0,
-        )
-      })
+const windNoiseUrl = '/wind-noise.mp3'
 
-      const whistleBand = addFilter(
-        ctx,
-        graph,
-        'bandpass',
-        tuning.whistleHz,
-        tuning.whistleQ,
+export const windSource: AudioSourceFactory = (ctx, destination) => {
+  const gainNode = ctx.createGain()
+  gainNode.gain.value = 0
+
+  const mediaElement = new Audio(windNoiseUrl)
+  mediaElement.loop = true
+  mediaElement.preload = 'auto'
+
+  const mediaSource = ctx.createMediaElementSource(mediaElement)
+  mediaSource.connect(gainNode)
+  gainNode.connect(destination)
+
+  let gain = 1
+  let started = false
+
+  return {
+    start() {
+      if (started) {
+        if (mediaElement.paused) {
+          void mediaElement.play()
+        }
+        return
+      }
+
+      started = true
+      const now = ctx.currentTime
+      gainNode.gain.setValueAtTime(0, now)
+      void mediaElement.play().catch((error) => {
+        console.error('Unable to play wind noise', error)
+      })
+      gainNode.gain.setTargetAtTime(
+        gain,
+        now,
+        SOURCE_TUNING.sourceRampSeconds,
       )
-      const whistleGain = addGain(ctx, graph, tuning.whistleGain)
-      noise.connect(whistleBand)
-      whistleBand.connect(whistleGain)
-      whistleGain.connect(output)
     },
-  )
+    stop() {
+      if (!started) return
+
+      started = false
+      mediaElement.pause()
+      mediaElement.currentTime = 0
+      gainNode.gain.setTargetAtTime(
+        0,
+        ctx.currentTime,
+        SOURCE_TUNING.sourceRampSeconds,
+      )
+    },
+    setGain(nextGain) {
+      gain = Number.isFinite(nextGain) ? Math.min(1, Math.max(0, nextGain)) : 0
+      if (started) {
+        gainNode.gain.setTargetAtTime(
+          gain,
+          ctx.currentTime,
+          SOURCE_TUNING.sourceRampSeconds,
+        )
+      }
+    },
+  }
 }

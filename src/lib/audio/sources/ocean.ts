@@ -1,71 +1,65 @@
-import { randomRange } from '../audioMath'
-import { startLookaheadScheduler } from '../scheduler'
-import {
-  addFilter,
-  addGain,
-  addNoiseSource,
-  createSource,
-} from '../sourceUtils'
 import { SOURCE_TUNING } from '../tuning'
 import type { AudioSourceFactory } from '../sources'
 
+const oceanNoiseUrl = '/ocean-noise.mp3'
+
 export const oceanSource: AudioSourceFactory = (ctx, destination) => {
-  const tuning = SOURCE_TUNING.ocean
-  return createSource(
-    ctx,
-    destination,
-    tuning.baseGain,
-    tuning.lowpassHz,
-    (output, graph) => {
-      const brown = addNoiseSource(ctx, graph, 'brown')
-      const swellFilter = addFilter(ctx, graph, 'lowpass', tuning.swellHighHz)
-      const swellGain = addGain(ctx, graph, tuning.swellFloor)
-      brown.connect(swellFilter)
-      swellFilter.connect(swellGain)
-      swellGain.connect(output)
+  const gainNode = ctx.createGain()
+  gainNode.gain.value = 0
 
-      const white = addNoiseSource(ctx, graph, 'white')
-      const foamHighpass = addFilter(
-        ctx,
-        graph,
-        'highpass',
-        tuning.foamHighpassHz,
-      )
-      const foamLowpass = addFilter(ctx, graph, 'lowpass', tuning.foamLowpassHz)
-      const foamGain = addGain(ctx, graph, 0)
-      white.connect(foamHighpass)
-      foamHighpass.connect(foamLowpass)
-      foamLowpass.connect(foamGain)
-      foamGain.connect(output)
+  const mediaElement = new Audio(oceanNoiseUrl)
+  mediaElement.loop = true
+  mediaElement.preload = 'auto'
 
-      let nextSwellAt =
-        ctx.currentTime + SOURCE_TUNING.scheduler.minimumLeadSeconds
-      startLookaheadScheduler(ctx, graph, SOURCE_TUNING.scheduler, (window) => {
-        while (nextSwellAt <= window.end) {
-          const cycle = randomRange(
-            tuning.cycleMinSeconds,
-            tuning.cycleMaxSeconds,
-          )
-          const crestAt = nextSwellAt + cycle * tuning.swellCrestFraction
-          const endAt = nextSwellAt + cycle
-          swellGain.gain.setValueAtTime(tuning.swellFloor, nextSwellAt)
-          swellGain.gain.linearRampToValueAtTime(tuning.swellPeak, crestAt)
-          swellGain.gain.linearRampToValueAtTime(tuning.swellFloor, endAt)
-          foamGain.gain.setValueAtTime(0, nextSwellAt)
-          foamGain.gain.linearRampToValueAtTime(tuning.foamGain, crestAt)
-          foamGain.gain.linearRampToValueAtTime(0, endAt)
-          swellFilter.frequency.setValueAtTime(tuning.swellLowHz, nextSwellAt)
-          swellFilter.frequency.linearRampToValueAtTime(
-            tuning.swellHighHz,
-            crestAt,
-          )
-          swellFilter.frequency.linearRampToValueAtTime(
-            tuning.swellLowHz,
-            endAt,
-          )
-          nextSwellAt = endAt
+  const mediaSource = ctx.createMediaElementSource(mediaElement)
+  mediaSource.connect(gainNode)
+  gainNode.connect(destination)
+
+  let gain = 1
+  let started = false
+
+  return {
+    start() {
+      if (started) {
+        if (mediaElement.paused) {
+          void mediaElement.play()
         }
+        return
+      }
+
+      started = true
+      const now = ctx.currentTime
+      gainNode.gain.setValueAtTime(0, now)
+      void mediaElement.play().catch((error) => {
+        console.error('Unable to play ocean noise', error)
       })
+      gainNode.gain.setTargetAtTime(
+        gain,
+        now,
+        SOURCE_TUNING.sourceRampSeconds,
+      )
     },
-  )
+    stop() {
+      if (!started) return
+
+      started = false
+      mediaElement.pause()
+      mediaElement.currentTime = 0
+      gainNode.gain.setTargetAtTime(
+        0,
+        ctx.currentTime,
+        SOURCE_TUNING.sourceRampSeconds,
+      )
+    },
+    setGain(nextGain) {
+      gain = Number.isFinite(nextGain) ? Math.min(1, Math.max(0, nextGain)) : 0
+      if (started) {
+        gainNode.gain.setTargetAtTime(
+          gain,
+          ctx.currentTime,
+          SOURCE_TUNING.sourceRampSeconds,
+        )
+      }
+    },
+  }
 }
