@@ -111,6 +111,15 @@ button {
   }
 }
 
+@keyframes focus-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  45% {
+    filter: drop-shadow(0 0 18px color-mix(in srgb, var(--mode-accent) 55%, transparent));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

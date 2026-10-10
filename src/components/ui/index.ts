@@ -1,3 +1,5 @@
 export { default as GlassPanel } from './GlassPanel'
 export { default as IconButton } from './IconButton'
 export { default as Tooltip } from './Tooltip'
+export { default as Switch } from './Switch'
+export { default as NoticeToast } from './NoticeToast'

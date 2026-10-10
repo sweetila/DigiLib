@@ -6,6 +6,10 @@ import PanelHost from '@/components/PanelHost'
 import Toolbar from '@/components/Toolbar/Toolbar'
 import { useUIStore } from '@/store/useUIStore'
 import { useBackgroundStore } from '@/store/useBackgroundStore'
+import FocusClock from '@/components/Timer/FocusClock'
+import ModeAccentSync from '@/components/Timer/ModeAccentSync'
+import TimerEventsHandler from '@/components/Timer/TimerEventsHandler'
+import NoticeToast from '@/components/ui/NoticeToast'
 
 export default function AppShell() {
   const activePanel = useUIStore((state) => state.activePanel)
@@ -24,7 +28,11 @@ export default function AppShell() {
   }, [activePanel, closePanel])
 
   return (
-    <main className="fixed inset-0 overflow-hidden bg-bg text-text">
+    <>
+      <ModeAccentSync />
+      <TimerEventsHandler />
+      <NoticeToast />
+      <main className="fixed inset-0 overflow-hidden bg-bg text-text">
       <div className="fixed inset-0 z-0 overflow-hidden">
         <BackgroundLayer />
       </div>
@@ -39,16 +47,14 @@ export default function AppShell() {
           aria-label="Focus clock"
           className="absolute left-1/2 top-[13vh] -translate-x-1/2 text-center"
         >
-          <p className="m-0 font-display text-6xl font-light tabular-nums tracking-normal text-text drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-7xl">
-            25:00
-          </p>
-          <p className="mt-3 text-sm text-text/65">Ready when you are.</p>
+          <FocusClock />
         </section>
         <YouTubeAudioPlayer>
           <PanelHost />
           <Toolbar />
         </YouTubeAudioPlayer>
       </div>
-    </main>
+      </main>
+    </>
   )
 }

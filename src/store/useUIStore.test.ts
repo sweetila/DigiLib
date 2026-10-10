@@ -25,4 +25,11 @@ describe('useUIStore panel actions', () => {
     useUIStore.getState().closePanel()
     expect(useUIStore.getState().activePanel).toBeNull()
   })
+
+  it('shows and dismisses transient notices', () => {
+    useUIStore.getState().showNotice('Session saved.')
+    expect(useUIStore.getState().notice).toMatchObject({ message: 'Session saved.' })
+    useUIStore.getState().dismissNotice()
+    expect(useUIStore.getState().notice).toBeNull()
+  })
 })
