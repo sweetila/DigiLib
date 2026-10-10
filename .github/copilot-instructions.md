@@ -22,9 +22,12 @@ Vite, React 18, TypeScript (strict), Tailwind CSS v3, Zustand, Zod, lucide-react
 - A streak day requires at least 10 focused minutes in the local timezone.
 
 ## Audio rules
-- No audio files. Synthesize everything with the Web Audio API: white/pink/brown noise, rain, wind, ocean, a café murmur, and binaural delta/theta waves.
+- Rain, ocean, wind, and café use MP3 files in `/public`. Synthesize white/pink/brown noise and binaural delta/theta waves with the Web Audio API.
 - Delta/Theta need a "Best with headphones" hint. Never claim cognitive or medical benefits.
 - Visual background and audio source are fully independent systems.
+
+## Design tokens
+- Use the muted-vintage palette, Fraunces for timer/panel titles, Inter for UI, a grain overlay at `z-[12]`, and `--mode-accent` for per-mode timer color.
 
 ## Background rules
 - The core feature is a playable YouTube video as the fullscreen background, using the official YouTube IFrame Player API only. Never download or extract content.

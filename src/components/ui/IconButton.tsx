@@ -23,7 +23,7 @@ export default function IconButton({
         type={buttonProps.type ?? 'button'}
         aria-describedby={tooltipId}
         aria-pressed={active}
-        className={`grid size-11 place-items-center rounded-xl text-muted transition-colors hover:bg-white/10 hover:text-text focus-visible:outline-offset-2 ${active ? 'bg-accent/20 text-accent' : ''} ${className}`}
+        className={`grid size-11 place-items-center rounded-xl text-muted transition-colors hover:bg-text/10 hover:text-text focus-visible:outline-offset-2 ${active ? 'bg-accent/[0.18] text-accent ring-1 ring-accent/30' : ''} ${className}`}
       >
         {children}
       </button>

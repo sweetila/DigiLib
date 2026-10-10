@@ -45,7 +45,7 @@ export default function AudioPanel() {
         <p role="alert" className="m-0 text-sm text-muted">{errorMessage}</p>
       ) : null}
       {!hasPlayingSource ? (
-        <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-center">
+        <div className="rounded-xl border border-border bg-text/[0.03] p-4 text-center">
           <p className="m-0 text-sm text-text">Your room is quiet.</p>
           <button
             type="button"

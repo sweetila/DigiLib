@@ -147,7 +147,7 @@ function BackgroundStatus({
       <div className="fixed inset-0 z-[15] grid place-items-center">
         <button
           aria-label="Replay background video"
-          className="glass rounded-xl px-5 py-3 text-sm font-medium text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+          className="glass rounded-xl px-5 py-3 text-sm font-medium text-text hover:bg-text/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
           onClick={onReplay}
           type="button"
         >
@@ -161,17 +161,17 @@ function BackgroundStatus({
 
   const content =
     status === 'loading' ? (
-      <p className="glass m-0 animate-pulse px-5 py-3 text-sm text-white/80">
+      <p className="glass m-0 animate-pulse px-5 py-3 text-sm text-text/80">
         Loading environment...
       </p>
     ) : status === 'blocked' ? (
       <div className="glass max-w-md p-6 text-center">
-        <p className="m-0 text-sm leading-6 text-white/85">
+        <p className="m-0 text-sm leading-6 text-text/85">
           Your browser blocked autoplay. Click to start your study room.
         </p>
         <button
           aria-label="Start study room video"
-          className="mt-4 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90"
+          className="mt-4 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-text hover:bg-accent/90"
           onClick={onPlay}
           type="button"
         >
@@ -180,10 +180,10 @@ function BackgroundStatus({
       </div>
     ) : (
       <div className="glass max-w-md p-6 text-center">
-        <p className="m-0 text-sm leading-6 text-white/85">{errorMessage}</p>
+        <p className="m-0 text-sm leading-6 text-text/85">{errorMessage}</p>
         <button
           aria-label="Choose another video"
-          className="mt-4 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90"
+          className="mt-4 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-text hover:bg-accent/90"
           onClick={onChooseAnother}
           type="button"
         >

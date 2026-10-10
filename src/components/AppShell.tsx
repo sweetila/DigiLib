@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import YouTubeAudioPlayer from '@/components/Audio/YouTubeAudioPlayer'
 import { BackgroundLayer } from '@/components/Background'
+import GrainOverlay from '@/components/Background/GrainOverlay'
 import PanelHost from '@/components/PanelHost'
 import Toolbar from '@/components/Toolbar/Toolbar'
 import { useUIStore } from '@/store/useUIStore'
@@ -32,15 +33,16 @@ export default function AppShell() {
         className="fixed inset-0 z-10 bg-black"
         style={{ opacity: overlay / 100 }}
       />
+      <GrainOverlay />
       <div className="fixed inset-0 z-20">
         <section
           aria-label="Focus clock"
           className="absolute left-1/2 top-[13vh] -translate-x-1/2 text-center"
         >
-          <p className="m-0 text-6xl font-medium tabular-nums tracking-normal text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-7xl">
+          <p className="m-0 font-display text-6xl font-light tabular-nums tracking-normal text-text drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-7xl">
             25:00
           </p>
-          <p className="mt-3 text-sm text-white/65">Ready when you are.</p>
+          <p className="mt-3 text-sm text-text/65">Ready when you are.</p>
         </section>
         <YouTubeAudioPlayer>
           <PanelHost />

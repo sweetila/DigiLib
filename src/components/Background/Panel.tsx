@@ -18,11 +18,11 @@ export default function BackgroundPanel() {
 
   return (
     <div className="space-y-5">
-      <div aria-label="Background choices" className="grid grid-cols-3 rounded-xl bg-white/[0.04] p-1" role="tablist">
+      <div aria-label="Background choices" className="grid grid-cols-3 rounded-xl bg-text/[0.04] p-1" role="tablist">
         {(['YouTube', 'Image', 'Presets'] as const).map((option) => (
           <button
             aria-selected={tab === option}
-            className={`rounded-lg px-2 py-2 text-xs transition-colors ${tab === option ? 'bg-white/10 text-text' : 'text-muted hover:text-text'}`}
+            className={`rounded-lg px-2 py-2 text-xs transition-colors ${tab === option ? 'bg-text/10 text-text' : 'text-muted hover:text-text'}`}
             key={option}
             onClick={() => setTab(option)}
             role="tab"
@@ -39,7 +39,7 @@ export default function BackgroundPanel() {
             <label className="sr-only" htmlFor="youtube-background-url">YouTube video URL</label>
             <div className="flex gap-2">
               <input
-                className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-text placeholder:text-muted focus:border-accent focus:outline-none"
+                className="min-w-0 flex-1 rounded-xl border border-border bg-text/[0.04] px-3 py-2.5 text-sm text-text placeholder:text-muted focus:border-accent focus:outline-none"
                 id="youtube-background-url"
                 onChange={(event) => {
                   setUrl(event.currentTarget.value)
@@ -50,19 +50,19 @@ export default function BackgroundPanel() {
               />
               <button
                 aria-label="Set YouTube background"
-                className="rounded-xl bg-accent px-3 text-sm font-medium text-white hover:bg-accent/90"
+                className="rounded-xl bg-accent px-3 text-sm font-medium text-text hover:bg-accent/90"
                 type="submit"
               >
                 Enter
               </button>
             </div>
-            {error && <p className="m-0 text-sm text-red-300" role="alert">{error}</p>}
+            {error && <p className="m-0 text-sm text-danger" role="alert">{error}</p>}
           </form>
 
           {background.recentYouTube.length > 0 && (
             <div aria-label="Recent YouTube backgrounds" className="space-y-2">
               <div className="flex items-center justify-between">
-                <p className="m-0 text-xs font-medium text-muted">Recent</p>
+                <p className="m-0 text-xs font-medium uppercase tracking-[0.14em] text-muted">Recent</p>
                 <button
                   aria-label="Clear recent YouTube backgrounds"
                   className="rounded px-1 text-xs text-muted hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
@@ -94,7 +94,7 @@ export default function BackgroundPanel() {
                     </button>
                     <button
                       aria-label={`Remove ${recent.title || 'YouTube background'} from recents`}
-                      className="absolute right-1 top-1 grid size-5 translate-x-1 -translate-y-1 place-items-center rounded-full bg-black/75 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+                      className="absolute right-1 top-1 grid size-5 translate-x-1 -translate-y-1 place-items-center rounded-full bg-bg/75 text-xs text-text opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
                       onClick={() => background.removeRecentYouTube(recent.videoId)}
                       type="button"
                     >
@@ -107,7 +107,7 @@ export default function BackgroundPanel() {
           )}
 
           {background.youtube && (
-            <div className="flex items-center gap-3 rounded-xl bg-white/[0.04] p-2">
+            <div className="flex items-center gap-3 rounded-xl bg-text/[0.04] p-2">
               <img
                 alt=""
                 className="h-14 w-24 rounded-lg object-cover"
@@ -123,7 +123,7 @@ export default function BackgroundPanel() {
             <button
               aria-label="Freeze to still image (saves battery)"
               aria-pressed={background.freezeToStill}
-              className={`w-full rounded-xl border border-white/10 px-3 py-2 text-left text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent ${background.freezeToStill ? 'bg-white/10 text-text' : 'text-muted hover:bg-white/[0.06]'}`}
+              className={`w-full rounded-xl border border-border px-3 py-2 text-left text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent ${background.freezeToStill ? 'bg-text/10 text-text' : 'text-muted hover:bg-text/[0.06]'}`}
               onClick={() => background.setFreezeToStill(!background.freezeToStill)}
               type="button"
             >
@@ -132,7 +132,7 @@ export default function BackgroundPanel() {
             <div className="grid grid-cols-2 gap-2">
               <button
                 aria-label={background.videoPlaying ? 'Pause video' : 'Play video'}
-                className="rounded-xl border border-white/10 px-3 py-2 text-sm hover:bg-white/[0.06]"
+                className="rounded-xl border border-border px-3 py-2 text-sm hover:bg-text/[0.06]"
                 onClick={() => background.setVideoPlaying(!background.videoPlaying)}
                 type="button"
               >
@@ -140,7 +140,7 @@ export default function BackgroundPanel() {
               </button>
               <button
                 aria-label={background.videoMuted ? 'Unmute video' : 'Mute video'}
-                className="rounded-xl border border-white/10 px-3 py-2 text-sm hover:bg-white/[0.06]"
+                className="rounded-xl border border-border px-3 py-2 text-sm hover:bg-text/[0.06]"
                 onClick={() => background.setVideoMuted(!background.videoMuted)}
                 type="button"
               >
@@ -153,10 +153,10 @@ export default function BackgroundPanel() {
             <Slider label="Overlay darkness" min={0} max={100} value={background.overlay} onChange={background.setOverlay} />
           </div>
 
-          <div className="flex gap-2 border-t border-white/[0.08] pt-4">
+          <div className="flex gap-2 border-t border-border pt-4">
             <button
               aria-label="Reset background controls"
-              className="flex-1 rounded-xl border border-white/10 px-3 py-2 text-sm hover:bg-white/[0.06]"
+              className="flex-1 rounded-xl border border-border px-3 py-2 text-sm hover:bg-text/[0.06]"
               onClick={background.resetControls}
               type="button"
             >
@@ -164,7 +164,7 @@ export default function BackgroundPanel() {
             </button>
             <button
               aria-label="Remove background"
-              className="flex-1 rounded-xl border border-white/10 px-3 py-2 text-sm text-muted hover:bg-white/[0.06] hover:text-text"
+              className="flex-1 rounded-xl border border-border px-3 py-2 text-sm text-muted hover:bg-text/[0.06] hover:text-text"
               onClick={background.clearBackground}
               type="button"
             >

@@ -44,8 +44,8 @@ export default function PanelHost() {
         className="mr-2 flex max-h-[80vh] w-[min(380px,calc(100vw-7rem))] flex-col overflow-hidden motion-safe:animate-[panel-in_180ms_ease-out]"
         onClick={(event) => event.stopPropagation()}
       >
-        <header className="flex shrink-0 items-center justify-between border-b border-white/[0.08] px-5 py-4">
-          <h1 id="active-panel-title" className="m-0 text-base font-semibold">
+        <header className="flex shrink-0 items-center justify-between border-b border-border px-5 py-4">
+          <h1 id="active-panel-title" className="m-0 font-display text-base font-semibold">
             {titles[activePanel]}
           </h1>
           <IconButton aria-label="Close panel" onClick={closePanel}>

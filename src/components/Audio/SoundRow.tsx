@@ -29,7 +29,7 @@ export default function SoundRow({
       className={`rounded-xl border p-3 transition-colors ${
         playing
           ? 'border-accent/50 bg-accent/10'
-          : 'border-white/[0.08] bg-white/[0.02]'
+          : 'border-border bg-text/[0.02]'
       }`}
     >
       <div className="mb-2 flex items-center justify-between gap-2">
@@ -45,7 +45,7 @@ export default function SoundRow({
             aria-label={playing ? `Pause ${name}` : `Play ${name}`}
             aria-pressed={playing}
             onClick={onTogglePlaying}
-            className="grid size-10 place-items-center rounded-lg text-text hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
+            className="grid size-10 place-items-center rounded-lg text-text hover:bg-text/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
           >
             {playing
               ? <Pause aria-hidden="true" size={18} />
@@ -56,7 +56,7 @@ export default function SoundRow({
             aria-label={muted ? `Unmute ${name}` : `Mute ${name}`}
             aria-pressed={muted}
             onClick={onToggleMuted}
-            className="grid size-10 place-items-center rounded-lg text-muted hover:bg-white/10 hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
+            className="grid size-10 place-items-center rounded-lg text-muted hover:bg-text/10 hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
           >
             {muted
               ? <VolumeX aria-hidden="true" size={18} />

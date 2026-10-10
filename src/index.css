@@ -4,22 +4,33 @@
 
 :root {
   font-family: 'Inter', sans-serif;
-  color: #f8fafc;
-  background: #080b12;
+  color-scheme: dark;
+  color: #E8DFD0;
+  background: #0F0D0C;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --accent: #8b5cf6;
+  --accent: #C3A6D0;
+  --mode-accent: var(--accent);
+  --grain-opacity: 0.05;
+  --border-color: rgba(232, 223, 208, 0.09);
   --ui-opacity: 0.7;
   --ui-blur: 20px;
   --overlay-opacity: 0.35;
 }
 
+::selection {
+  color: #E8DFD0;
+  background: rgba(195, 166, 208, 0.3);
+}
+
 @layer components {
   .glass {
-    background: rgba(15, 23, 42, var(--ui-opacity, 0.7));
-    backdrop-filter: blur(var(--ui-blur, 20px));
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
+    background: rgba(26, 22, 19, var(--ui-opacity, 0.7));
+    backdrop-filter: blur(var(--ui-blur, 20px)) saturate(1.05);
+    border: 1px solid var(--border-color);
+    box-shadow:
+      0 16px 48px rgba(0, 0, 0, 0.32),
+      inset 0 1px 0 rgba(232, 223, 208, 0.06);
     border-radius: 16px;
   }
 }
@@ -40,10 +51,31 @@ body,
 body {
   min-height: 100vh;
   overflow: hidden;
-  background: #080b12;
-  color: #f8fafc;
+  background: #0F0D0C;
+  color: #E8DFD0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(232, 223, 208, 0.24) rgba(26, 22, 19, 0.45);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(26, 22, 19, 0.45);
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(232, 223, 208, 0.24);
+  background-clip: content-box;
 }
 
 button {

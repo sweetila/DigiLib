@@ -1,0 +1,15 @@
+export const palette = {
+  bg: '#0F0D0C',
+  bg2: '#1A1613',
+  panel: '#1D1814',
+  text: '#E8DFD0',
+  muted: '#9A8F82',
+  accent: '#C3A6D0',
+  accent2: '#7F9EA3',
+  rose: '#C98E93',
+  sage: '#9BAA8C',
+  apricot: '#D9A47F',
+  success: '#9BB89A',
+  warning: '#D9B26F',
+  danger: '#D98A8A',
+} as const

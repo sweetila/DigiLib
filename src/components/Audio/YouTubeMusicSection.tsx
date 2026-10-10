@@ -39,12 +39,12 @@ export default function YouTubeMusicSection() {
 
   return (
     <section aria-label="YouTube Music" className="space-y-3">
-      <h2 className="m-0 text-sm font-semibold text-text">YouTube Music</h2>
+      <h2 className="m-0 text-xs font-semibold uppercase tracking-[0.14em] text-muted">YouTube Music</h2>
       <form className="flex gap-2" onSubmit={addVideo}>
         <input
           ref={inputRef}
           aria-label="YouTube Music URL"
-          className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text placeholder:text-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+          className="min-w-0 flex-1 rounded-lg border border-border bg-text/[0.04] px-3 py-2 text-sm text-text placeholder:text-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
           onChange={(event) => {
             setUrl(event.currentTarget.value)
             setValidationMessage('')
@@ -65,7 +65,7 @@ export default function YouTubeMusicSection() {
       ) : null}
 
       {audio ? (
-        <div className="space-y-3 rounded-xl border border-white/[0.08] bg-white/[0.02] p-3">
+        <div className="space-y-3 rounded-xl border border-border bg-text/[0.02] p-3">
           <div className="flex items-center gap-3">
             <img
               alt=""
@@ -112,7 +112,7 @@ export default function YouTubeMusicSection() {
             <button
               aria-label={playing ? 'Pause YouTube Music' : 'Play YouTube Music'}
               aria-pressed={playing}
-              className="grid size-10 place-items-center rounded-lg text-text hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
+              className="grid size-10 place-items-center rounded-lg text-text hover:bg-text/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
               onClick={() => {
                 if (playing) player.pause()
                 else player.play()
@@ -124,7 +124,7 @@ export default function YouTubeMusicSection() {
             <button
               aria-label={muted ? 'Unmute YouTube Music' : 'Mute YouTube Music'}
               aria-pressed={muted}
-              className="grid size-10 place-items-center rounded-lg text-muted hover:bg-white/10 hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
+              className="grid size-10 place-items-center rounded-lg text-muted hover:bg-text/10 hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
               onClick={() => setMuted(!muted)}
               type="button"
             >
@@ -132,7 +132,7 @@ export default function YouTubeMusicSection() {
             </button>
             <button
               aria-label="Remove YouTube Music"
-              className="ml-auto grid size-10 place-items-center rounded-lg text-muted hover:bg-white/10 hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
+              className="ml-auto grid size-10 place-items-center rounded-lg text-muted hover:bg-text/10 hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
               onClick={clearYouTubeAudio}
               type="button"
             >

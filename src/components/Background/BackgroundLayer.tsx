@@ -72,7 +72,7 @@ export default function BackgroundLayer() {
 
   return (
     <>
-      <div className="fixed inset-0 overflow-hidden bg-[#080b12]">
+      <div className="fixed inset-0 overflow-hidden bg-bg">
         {layers.map((layer) =>
           layer.type === 'youtube' && layer.videoId ? (
             <YouTubeBackground
@@ -87,7 +87,7 @@ export default function BackgroundLayer() {
             <div
               aria-hidden="true"
               key={layer.key}
-              className={`background-drift fixed -inset-[6%] bg-[radial-gradient(ellipse_at_19%_20%,rgba(63,54,117,0.46),transparent_47%),radial-gradient(ellipse_at_78%_76%,rgba(26,57,84,0.34),transparent_48%),linear-gradient(135deg,#080b12_8%,#111426_52%,#080b12_100%)] transition-opacity duration-[800ms] motion-reduce:duration-0 ${layer.active ? 'opacity-100' : 'opacity-0'}`}
+              className={`background-drift fixed -inset-[6%] bg-[radial-gradient(ellipse_at_19%_20%,rgba(195,166,208,0.14),transparent_47%),radial-gradient(ellipse_at_78%_76%,rgba(127,158,163,0.12),transparent_48%),linear-gradient(135deg,#0F0D0C_8%,#1A1613_52%,#0F0D0C_100%)] transition-opacity duration-[800ms] motion-reduce:duration-0 ${layer.active ? 'opacity-100' : 'opacity-0'}`}
             />
           ),
         )}
